@@ -14,81 +14,89 @@ type SyncHandle struct {
 }
 
 func (s SyncHandle) SyncHandler(w http.ResponseWriter, r *http.Request) {
-	getParams := make(map[string][]string)
-	if r.ParseForm() == nil {
-		for k, v := range r.Form {
-			if len(v) > 0 {
-				getParams[k] = v
+
+	go func() {
+
+		log.Println("Database sync Started...")
+
+		getParams := make(map[string][]string)
+		if r.ParseForm() == nil {
+			for k, v := range r.Form {
+				if len(v) > 0 {
+					getParams[k] = v
+				}
 			}
 		}
-	}
 
-	c := colly.NewCollector(
-		colly.AllowedDomains("stopcorona.tn.gov.in","www.stopcorona.tn.gov.in"),
-	)
-	// Before making a request print "Visiting ..."
-	c.OnRequest(func(r *colly.Request) {
-		log.Println("visiting", r.URL.String())
-	})
-	HospitatStat := make([]*model.HospitalStatus,0)
-	c.OnHTML(`table[id=dtBasicExample]`, func(e *colly.HTMLElement) {
-		// Iterate over rows of the table which contains different information
-		// about the course
+		c := colly.NewCollector(
+			colly.AllowedDomains("stopcorona.tn.gov.in","www.stopcorona.tn.gov.in"),
+		)
+		// Before making a request print "Visiting ..."
+		c.OnRequest(func(r *colly.Request) {
+			log.Println("visiting", r.URL.String())
+		})
+		HospitatStat := make([]*model.HospitalStatus,0)
+		c.OnHTML(`table[id=dtBasicExample]`, func(e *colly.HTMLElement) {
+			// Iterate over rows of the table which contains different information
+			// about the course
 
-		e.ForEach("tr", func(_ int, el *colly.HTMLElement) {
-			if el.ChildText("td:nth-child(2)")!=""{
-				sta := &model.HospitalStatus{
-					District : el.ChildText("td:nth-child(2)"),
-					Institution:  el.ChildText("td:nth-child(3)"),
-					CovidBeds: model.Status{
-						Total:    getInt64(el.ChildText("td:nth-child(4)")),
-						Occupied: getInt64(el.ChildText("td:nth-child(5)")),
-						Vacant:   getInt64(el.ChildText("td:nth-child(6)")),
-					},
-					OxygenSupportedBeds: model.Status{
-						Total:    getInt64(el.ChildText("td:nth-child(7)")),
-						Occupied: getInt64(el.ChildText("td:nth-child(8)")),
-						Vacant:   getInt64(el.ChildText("td:nth-child(9)")),
-					},
-					NonOxygenSupportedBeds: model.Status{
-						Total:    getInt64(el.ChildText("td:nth-child(10)")),
-						Occupied: getInt64(el.ChildText("td:nth-child(11)")),
-						Vacant:   getInt64(el.ChildText("td:nth-child(12)")),
-					},
-					ICUBeds: model.Status{
-						Total:    getInt64(el.ChildText("td:nth-child(13)")),
-						Occupied: getInt64(el.ChildText("td:nth-child(14)")),
-						Vacant:   getInt64(el.ChildText("td:nth-child(15)")),
-					},
-					Ventilator: model.Status{
-						Total:    getInt64(el.ChildText("td:nth-child(16)")),
-						Occupied: getInt64(el.ChildText("td:nth-child(17)")),
-						Vacant:   getInt64(el.ChildText("td:nth-child(18)")),
-					},
-					LastUpdate: el.ChildText("td:nth-child(19)"),
-					ContactNumber: el.ChildText("td:nth-child(20)"),
-					Remarks:el.ChildText("td:nth-child(21)"),
+			e.ForEach("tr", func(_ int, el *colly.HTMLElement) {
+				if el.ChildText("td:nth-child(2)")!=""{
+					sta := &model.HospitalStatus{
+						District : el.ChildText("td:nth-child(2)"),
+						Institution:  el.ChildText("td:nth-child(3)"),
+						CovidBeds: model.Status{
+							Total:    getInt64(el.ChildText("td:nth-child(4)")),
+							Occupied: getInt64(el.ChildText("td:nth-child(5)")),
+							Vacant:   getInt64(el.ChildText("td:nth-child(6)")),
+						},
+						OxygenSupportedBeds: model.Status{
+							Total:    getInt64(el.ChildText("td:nth-child(7)")),
+							Occupied: getInt64(el.ChildText("td:nth-child(8)")),
+							Vacant:   getInt64(el.ChildText("td:nth-child(9)")),
+						},
+						NonOxygenSupportedBeds: model.Status{
+							Total:    getInt64(el.ChildText("td:nth-child(10)")),
+							Occupied: getInt64(el.ChildText("td:nth-child(11)")),
+							Vacant:   getInt64(el.ChildText("td:nth-child(12)")),
+						},
+						ICUBeds: model.Status{
+							Total:    getInt64(el.ChildText("td:nth-child(13)")),
+							Occupied: getInt64(el.ChildText("td:nth-child(14)")),
+							Vacant:   getInt64(el.ChildText("td:nth-child(15)")),
+						},
+						Ventilator: model.Status{
+							Total:    getInt64(el.ChildText("td:nth-child(16)")),
+							Occupied: getInt64(el.ChildText("td:nth-child(17)")),
+							Vacant:   getInt64(el.ChildText("td:nth-child(18)")),
+						},
+						LastUpdate: el.ChildText("td:nth-child(19)"),
+						ContactNumber: el.ChildText("td:nth-child(20)"),
+						Remarks:el.ChildText("td:nth-child(21)"),
+					}
+					HospitatStat = append(HospitatStat,sta)
 				}
-				HospitatStat = append(HospitatStat,sta)
-			}
+			})
+
 		})
 
-	})
 
+		// Start scraping on http://coursera.com/browse
+		c.Visit("https://stopcorona.tn.gov.in/beds.php")
+		// Print to check the slice's content
 
-	// Start scraping on http://coursera.com/browse
-	c.Visit("https://stopcorona.tn.gov.in/beds.php")
-	// Print to check the slice's content
-
-	action:= getParams["action"]
-	if len(action)>0{
-		if action[0] =="update"{
-			s.updateHospitaStatus(HospitatStat)
+		action:= getParams["action"]
+		if len(action)>0{
+			if action[0] =="update"{
+				s.updateHospitaStatus(HospitatStat)
+			}
+			if action[0]=="create"{
+				s.insertHospitalStatus(HospitatStat)
+			}
 		}
-		if action[0]=="create"{
-			s.insertHospitalStatus(HospitatStat)
-		}
-	}
+		log.Println("Database synced...")
+
+	}()
 
 
 }

@@ -28,60 +28,66 @@ type NotifyHandle struct {
 	Env string
 }
 func (h NotifyHandle) NotifyHandler(w http.ResponseWriter, r *http.Request) {
-	hospitalStatus := h.evaluateHospitalStatus()
-	total :=h.countPushSubscriptions()
 
-	if total>0{
-		limit := int64(defaultLimit)
-		noPages := 0
+	go func() {
+		log.Println("Notify Started...")
+		hospitalStatus := h.evaluateHospitalStatus()
+		total :=h.countPushSubscriptions()
 
-		if total> defaultLimit {
+		if total>0{
 			limit := int64(defaultLimit)
-			noPages = int(math.Round(float64(total)/float64(limit)))
-		}
+			noPages := 0
 
-		if noPages>0{
-			for i :=0; i<noPages;i++{
-				records := h.getPushSubscriptions(limit,int64(i))
-				if len(records)>0{
-					for i:=0;i<len(records);i++{
-						pushlog,msg := h.getNotificationMessage(records[i],hospitalStatus)
-						if pushlog!=nil&&msg!=nil{
-							m,err := h.sendPushNotification(msg)
-							if err!=nil{
-								log.Printf("push not send %s", err.Error())
-								continue
+			if total> defaultLimit {
+				limit := int64(defaultLimit)
+				noPages = int(math.Round(float64(total)/float64(limit)))
+			}
+
+			if noPages>0{
+				for i :=0; i<noPages;i++{
+					records := h.getPushSubscriptions(limit,int64(i))
+					if len(records)>0{
+						for i:=0;i<len(records);i++{
+							pushlog,msg := h.getNotificationMessage(records[i],hospitalStatus)
+							if pushlog!=nil&&msg!=nil{
+								m,err := h.sendPushNotification(msg)
+								if err!=nil{
+									log.Printf("push not send %s", err.Error())
+									continue
+								}
+								//update status
+								pushlog.Status =m
+								//update database
+								h.UpdatePushLogs(*pushlog.Id,m)
+
 							}
-							//update status
-							pushlog.Status =m
-							//update database
-							h.UpdatePushLogs(*pushlog.Id,m)
-
 						}
-					}
 
+					}
+				}
+			}
+			records := h.getPushSubscriptions(limit,int64(noPages))
+			if len(records)>0{
+				for i:=0;i<len(records);i++{
+					pushlog,msg := h.getNotificationMessage(records[i],hospitalStatus)
+					if pushlog!=nil&&msg!=nil{
+						m,err := h.sendPushNotification(msg)
+						if err!=nil{
+							log.Printf("push not send %s", err.Error())
+							continue
+						}
+						//update status
+						pushlog.Status =m
+						//update database
+						h.UpdatePushLogs(*pushlog.Id,m)
+
+					}
 				}
 			}
 		}
-		records := h.getPushSubscriptions(limit,int64(noPages))
-		if len(records)>0{
-			for i:=0;i<len(records);i++{
-				pushlog,msg := h.getNotificationMessage(records[i],hospitalStatus)
-				if pushlog!=nil&&msg!=nil{
-					m,err := h.sendPushNotification(msg)
-					if err!=nil{
-						log.Printf("push not send %s", err.Error())
-						continue
-					}
-					//update status
-					pushlog.Status =m
-					//update database
-					h.UpdatePushLogs(*pushlog.Id,m)
+		log.Println("Notify Ended...")
+	}()
 
-				}
-			}
-		}
-	}
 }
 
 func (h NotifyHandle) sendPushNotification(message *messaging.Message)(string,error){
