@@ -14,7 +14,6 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	"time"
 )
 
 func main() {
@@ -51,16 +50,9 @@ func main() {
 		changeHeaderThenServe(http.FileServer(http.Dir("./static/")))))
 
 	http.Handle("/", router)
+	port := viper.GetInt64("PORT")
 
-	srv := &http.Server{
-		Handler: router,
-		Addr:    "127.0.0.1:8000",
-		// Good practice: enforce timeouts for servers you create!
-		WriteTimeout: 15 * time.Second,
-		ReadTimeout:  15 * time.Second,
-	}
-
-	log.Fatal(srv.ListenAndServe())
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), router))
 }
 
 func initConfig() {
@@ -107,8 +99,6 @@ func initDatabase() *sqlx.DB {
 			viper.GetString("DATABASE_NAME"),
 			viper.GetString("SSL_MODE"),
 			)
-
-	log.Println(viper.GetString("DB_PORT"))
 
 	db, err := sqlx.Connect("postgres", psqlInfo)
 	if err != nil {
