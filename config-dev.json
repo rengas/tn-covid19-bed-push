@@ -1,7 +1,7 @@
 {
-  "host" : "localhost",
-  "port" : 5432,
-  "userName" : "backend",
-  "password": "tncovid19",
-  "dbname":"tn-covid19-bed-alert"
+  "HOST" : "localhost",
+  "PORT" : 5432,
+  "USER_NAME" : "backend",
+  "PASSWORD": "tncovid19",
+  "DATABASE_NAME":"tn-covid19-bed-alert"
 }
