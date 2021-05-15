@@ -52,7 +52,9 @@ func main() {
 	http.Handle("/", router)
 	port := viper.GetInt64("PORT")
 
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), router))
+	addr := fmt.Sprintf(":%d", port)
+	log.Printf("printing port...%s",addr)
+	log.Fatal(http.ListenAndServe(addr, router))
 }
 
 func initConfig() {
