@@ -66,17 +66,20 @@ func main() {
 func initConfig() {
 	viper.AutomaticEnv()
 	environment := viper.GetString("GO_ENV")
-	viper.AddConfigPath(".")
-	filename := "config-" + environment + ".json"
-	log.Printf("setting up config from %s", filename)
+	if environment=="dev"{
+		viper.AddConfigPath(".")
+		filename := "config-" + environment + ".json"
+		log.Printf("setting up config from %s", filename)
 
-	viper.SetConfigFile(filename)
-	viper.SetConfigType("json")
+		viper.SetConfigFile(filename)
+		viper.SetConfigType("json")
 
-	err := viper.ReadInConfig() // Find and read the config file
-	if err != nil {             // Handle errors reading the config file
-		log.Fatalf("Fatal error config file: %s \n", err)
+		err := viper.ReadInConfig() // Find and read the config file
+		if err != nil {             // Handle errors reading the config file
+			log.Fatalf("Fatal error config file: %s \n", err)
+		}
 	}
+
 }
 
 func initFcm() *messaging.Client {
@@ -96,12 +99,12 @@ func initFcm() *messaging.Client {
 
 func initDatabase() *sqlx.DB {
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
-		"password=%s dbname=%s sslmode=disable",
-		viper.GetString("host"),
-		viper.GetInt64("port"),
-		viper.GetString("userName"),
-		viper.GetString("password"),
-		viper.GetString("dbname"))
+			"password=%s dbname=%s sslmode=disable",
+			viper.GetString("host"),
+			viper.GetInt64("port"),
+			viper.GetString("userName"),
+			viper.GetString("password"),
+			viper.GetString("dbname"))
 
 	db, err := sqlx.Connect("postgres", psqlInfo)
 	if err != nil {
