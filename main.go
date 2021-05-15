@@ -101,15 +101,14 @@ func initDatabase() *sqlx.DB {
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 			"password=%s dbname=%s sslmode=%s",
 			viper.GetString("HOST"),
-			viper.GetInt64("PORT"),
+			viper.GetInt64("DB_PORT"),
 			viper.GetString("USER_NAME"),
 			viper.GetString("PASSWORD"),
 			viper.GetString("DATABASE_NAME"),
 			viper.GetString("SSL_MODE"),
 			)
 
-	log.Println(viper.GetString("HOST"))
-	log.Println(viper.GetString("PORT"))
+	log.Println(viper.GetString("DB_PORT"))
 
 	db, err := sqlx.Connect("postgres", psqlInfo)
 	if err != nil {
