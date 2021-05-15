@@ -297,7 +297,7 @@ func (h NotifyHandle) getNotificationMessage(u model.UserSubscription, hs map[in
 	link := fmt.Sprintf("http://localhost:8000/message?id=%d",*pushLog.Id)
 	if h.Env=="prd"{
 		//TODO this should be replaced with actual domain
-		link=fmt.Sprintf("https://tn-covid-beds.renga.me/message/?id=%d",id)
+		link=fmt.Sprintf("https://tn-covid-beds.renga.me/message?id=%d",id)
 	}
 
 	message := &messaging.Message{
