@@ -2,37 +2,57 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Tamil Nadu Push Notification</title>
+    <title>Tamil Nadu BedsPush Notification</title>
+    <style>
+        div {
+            color: #fff;
+            font-family: Tahoma, Verdana, Segoe, sans-serif;
+            padding: 10px;
+        }
+        .container {
+            background-color:#fa9861;
+            display:flex;
+        }
+    </style>
 </head>
 <body>
-<h1> Unsubscribe Me </h1>
-<h2> You will be not receive notification in all devices</h2>
-<form action="/unsubscribe" method="post">
-    Email:<input type="text" name="email">
-    <input type="submit" value="Unsubscribe">
-</form>
-<h1> Subscribe Me </h1>
-<h2> Please use a valid Email!!!</h2>
-<form id="submitForm">
-    <input type="text" name="email" value="">
+<h1> Recieve push notification for updates on vacant hospital beds in tamil nadu from</h1>
+<h2> The information in this website is updated from official
+    <a href=" https://stopcorona.tn.gov.in/beds.php">https://stopcorona.tn.gov.in/beds.php</a>
+    every 15 minutes
+</h2>
+<div class="container">
+    <div style="display: inline-block">
+        <h1> <p>Create or update subscription for push Notification</p> </h1>
+        <h2> Please use a valid Email</h2>
+        <form id="submitForm">
+            <input type="text" name="email" value="">
 
-    <select id="district" name="district">
-        {{range $index, $element := .}}
-            <option value={{$index}}>{{$index}}</option>
-        {{end}}
-    </select>
-        {{range $index, $element := .}}
-            <div id={{$index}} class="group">
-                {{range $index, $val := $element}}
-                    <input type="checkbox" id={{$val.Id}} name={{$val.District}} value={{$val.Id}}>
-                    <label for={{$val.Id}}> {{$val.Institution}}</label><br>
+            <select id="district" name="district">
+                {{range $index, $element := .}}
+                    <option value={{$index}}>{{$index}}</option>
                 {{end}}
-            </div>
-        {{end}}
-    <input type="button" value="Submit" id="myButton" />
-</form>
-
-
+            </select>
+            {{range $index, $element := .}}
+                <div id={{$index}} class="group">
+                    {{range $index, $val := $element}}
+                        <input type="checkbox" id={{$val.Id}} name={{$val.District}} value={{$val.Id}}>
+                        <label for={{$val.Id}}> {{$val.Institution}}</label><br>
+                    {{end}}
+                </div>
+            {{end}}
+            <input type="button" value="Submit" id="myButton" />
+        </form>
+    </div>
+    <div style="display: inline-block">
+        <h1> Remove my Subscription</h1>
+        <h2> You will be not receive notification in all devices</h2>
+        <form action="/unsubscribe" method="post">
+            Email:<input type="text" name="email">
+            <input type="submit" value="Unsubscribe">
+        </form>
+    </div>
+</div>
 </body>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous">
 </script>

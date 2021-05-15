@@ -52,7 +52,7 @@ $(document).ready(function(){
                             dataType: 'json'
                         }).done(function(data) {
                             alert("Thanks for the submission!");
-                            console.log("Response Data" + data); //Log the server response to console
+                            $('#submitForm')[0].reset();
                         });
 
                     } else {

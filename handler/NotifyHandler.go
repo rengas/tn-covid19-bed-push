@@ -13,6 +13,7 @@ import (
 	"log"
 	"math"
 	"net/http"
+	"errors"
 )
 
 const (
@@ -46,7 +47,11 @@ func (h NotifyHandle) NotifyHandler(w http.ResponseWriter, r *http.Request) {
 					for i:=0;i<len(records);i++{
 						pushlog,msg := h.getNotificationMessage(records[i],hospitalStatus)
 						if pushlog!=nil&&msg!=nil{
-							m := h.sendPushNotification(msg)
+							m,err := h.sendPushNotification(msg)
+							if err!=nil{
+								log.Printf("push not send %s", err.Error())
+								continue
+							}
 							//update status
 							pushlog.Status =m
 							//update database
@@ -63,7 +68,11 @@ func (h NotifyHandle) NotifyHandler(w http.ResponseWriter, r *http.Request) {
 			for i:=0;i<len(records);i++{
 				pushlog,msg := h.getNotificationMessage(records[i],hospitalStatus)
 				if pushlog!=nil&&msg!=nil{
-					m := h.sendPushNotification(msg)
+					m,err := h.sendPushNotification(msg)
+					if err!=nil{
+						log.Printf("push not send %s", err.Error())
+						continue
+					}
 					//update status
 					pushlog.Status =m
 					//update database
@@ -75,15 +84,17 @@ func (h NotifyHandle) NotifyHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h NotifyHandle) sendPushNotification(message *messaging.Message)string{
+func (h NotifyHandle) sendPushNotification(message *messaging.Message)(string,error){
 	id, err := h.Fcm.Send(context.Background(), message)
 	if err!=nil{
-		return err.Error()
+		log.Printf("unable to send push notification %s", err.Error())
+		return "",err
 	}
 	if id==""{
-		return Unsent
+		log.Printf("unable to send push notification %s", err.Error())
+		return Unsent,errors.New("id is empty")
 	}
-	return id
+	return id, nil
 }
 
 func (h NotifyHandle) evaluateHospitalStatus() map[int64]model.HospitalStatus {
@@ -285,7 +296,8 @@ func (h NotifyHandle) getNotificationMessage(u model.UserSubscription, hs map[in
 
 	link := fmt.Sprintf("http://localhost:8000/message?id=%d",*pushLog.Id)
 	if h.Env=="prd"{
-		link=fmt.Sprintf("domain/%d",id)
+		//TODO this should be replaced with actual domain
+		link=fmt.Sprintf("https://tn-covid19-bed-alert.herokuapp.com/message/?id=%d",id)
 	}
 
 	message := &messaging.Message{
