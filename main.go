@@ -83,8 +83,8 @@ func initConfig() {
 }
 
 func initFcm() *messaging.Client {
-
-	opt := option.WithCredentialsFile("refreshToken.json")
+	creds := viper.GetString("GOOGLE_CREDS")
+	opt := option.WithCredentialsJSON([]byte(creds))
 	config := &firebase.Config{ProjectID: "tn-covid-bed-alert"}
 	app, err := firebase.NewApp(context.Background(), config, opt)
 	if err != nil {
