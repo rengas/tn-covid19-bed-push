@@ -2,3 +2,4 @@ config-prd.json
 tn_covid19_bed_alert_dev
 .idea/*
 refreshToken.json
+credentials

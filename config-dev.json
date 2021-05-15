@@ -3,5 +3,6 @@
   "PORT" : 5432,
   "USER_NAME" : "backend",
   "PASSWORD": "tncovid19",
-  "DATABASE_NAME":"tn-covid19-bed-alert"
+  "DATABASE_NAME":"tn-covid19-bed-alert",
+  "SSL_MODE": "disable"
 }

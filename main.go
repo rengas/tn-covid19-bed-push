@@ -99,15 +99,17 @@ func initFcm() *messaging.Client {
 
 func initDatabase() *sqlx.DB {
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
-			"password=%s dbname=%s sslmode=disable",
+			"password=%s dbname=%s sslmode=%s",
 			viper.GetString("HOST"),
 			viper.GetInt64("PORT"),
 			viper.GetString("USER_NAME"),
 			viper.GetString("PASSWORD"),
-			viper.GetString("DATABASE_NAME"))
+			viper.GetString("DATABASE_NAME"),
+			viper.GetString("SSL_MODE"),
+			)
 
 	log.Println(viper.GetString("HOST"))
-	log.Println(viper.GetString("USER_NAME"))
+	log.Println(viper.GetString("PORT"))
 
 	db, err := sqlx.Connect("postgres", psqlInfo)
 	if err != nil {
