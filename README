@@ -1,0 +1,13 @@
+#Architecture
+
+1. A Go cron that polls this "https://stopcorona.tn.gov.in/beds.php","table",1
+every 15 minutes and update database table.
+
+2. A web page that has subscribe and unsubscribe options where users input their
+email to do one of the options together with the list of hospitals
+that user want to receive push notification.
+
+3. Another Go cron that looks up the subscription list and sends notification as summary
+to users every 20 minutes together page where user get complete information about
+the hospital status.
+

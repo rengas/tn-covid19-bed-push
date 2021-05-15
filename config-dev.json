@@ -1,0 +1,7 @@
+{
+  "host" : "localhost",
+  "port" : 5432,
+  "userName" : "backend",
+  "password": "tncovid19",
+  "dbname":"tn-covid19-bed-alert"
+}

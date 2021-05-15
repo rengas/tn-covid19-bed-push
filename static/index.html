@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tamil Nadu Push Notification</title>
+</head>
+<body>
+<h1> Unsubscribe Me </h1>
+<h2> You will be not receive notification in all devices</h2>
+<form action="/unsubscribe" method="post">
+    Email:<input type="text" name="email">
+    <input type="submit" value="Unsubscribe">
+</form>
+<h1> Subscribe Me </h1>
+<h2> Please use a valid Email!!!</h2>
+<form id="submitForm">
+    <input type="text" name="email" value="">
+
+    <select id="district" name="district">
+        {{range $index, $element := .}}
+            <option value={{$index}}>{{$index}}</option>
+        {{end}}
+    </select>
+        {{range $index, $element := .}}
+            <div id={{$index}} class="group">
+                {{range $index, $val := $element}}
+                    <input type="checkbox" id={{$val.Id}} name={{$val.District}} value={{$val.Id}}>
+                    <label for={{$val.Id}}> {{$val.Institution}}</label><br>
+                {{end}}
+            </div>
+        {{end}}
+    <input type="button" value="Submit" id="myButton" />
+</form>
+
+
+</body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous">
+</script>
+<script src="https://www.gstatic.com/firebasejs/8.6.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.6.0/firebase-messaging.js"></script>
+<script src="/static/main.js"></script>
+
+</html>
