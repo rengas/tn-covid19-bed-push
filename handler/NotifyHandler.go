@@ -2,18 +2,17 @@ package handler
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"firebase.google.com/go/messaging"
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
+	"github.com/rengas/tn-covid19-bed-alert/client"
 	"github.com/rengas/tn-covid19-bed-alert/model"
 	"html/template"
 	"log"
 	"math"
 	"net/http"
-	"errors"
 )
 
 const (
@@ -24,7 +23,7 @@ const (
 type NotifyHandle struct {
 	Tmpl *template.Template
 	Database *sqlx.DB
-	Fcm *messaging.Client
+	Fcm *client.FCMClient
 	Env string
 }
 func (h NotifyHandle) NotifyHandler(w http.ResponseWriter, r *http.Request) {
@@ -50,7 +49,7 @@ func (h NotifyHandle) NotifyHandler(w http.ResponseWriter, r *http.Request) {
 						for i:=0;i<len(records);i++{
 							pushlog,msg := h.getNotificationMessage(records[i],hospitalStatus)
 							if pushlog!=nil&&msg!=nil{
-								m,err := h.sendPushNotification(msg)
+								m,err := h.Fcm.SendPushNotification(msg)
 								if err!=nil{
 									log.Printf("push not send %s", err.Error())
 									continue
@@ -71,7 +70,7 @@ func (h NotifyHandle) NotifyHandler(w http.ResponseWriter, r *http.Request) {
 				for i:=0;i<len(records);i++{
 					pushlog,msg := h.getNotificationMessage(records[i],hospitalStatus)
 					if pushlog!=nil&&msg!=nil{
-						m,err := h.sendPushNotification(msg)
+						m,err := h.Fcm.SendPushNotification(msg)
 						if err!=nil{
 							log.Printf("push not send %s", err.Error())
 							continue
@@ -88,19 +87,6 @@ func (h NotifyHandle) NotifyHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println("Notify Ended...")
 	}()
 
-}
-
-func (h NotifyHandle) sendPushNotification(message *messaging.Message)(string,error){
-	id, err := h.Fcm.Send(context.Background(), message)
-	if err!=nil{
-		log.Printf("unable to send push notification %s", err.Error())
-		return "",err
-	}
-	if id==""{
-		log.Printf("unable to send push notification %s", err.Error())
-		return Unsent,errors.New("id is empty")
-	}
-	return id, nil
 }
 
 func (h NotifyHandle) evaluateHospitalStatus() map[int64]model.HospitalStatus {

@@ -3,11 +3,11 @@ package main
 import (
 	"context"
 	firebase "firebase.google.com/go"
-	"firebase.google.com/go/messaging"
 	"fmt"
 	"github.com/gorilla/mux"
 	sqlx "github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
+	"github.com/rengas/tn-covid19-bed-alert/client"
 	"github.com/rengas/tn-covid19-bed-alert/handler"
 	"github.com/spf13/viper"
 	"google.golang.org/api/option"
@@ -21,6 +21,7 @@ func main() {
 	initConfig()
 	db := initDatabase()
 	fcm := initFcm()
+
 	homeTmpl := template.Must(template.ParseFiles("./static/index.html")) // Parse template file.
 	statusTmpl := template.Must(template.ParseFiles("./static/sub_status.html"))
 	env := viper.GetString("GO_ENV")
@@ -28,9 +29,9 @@ func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/", handler.HomeHandle{homeTmpl, db}.HomeHandler)
 	router.HandleFunc("/health", handler.HealthHandler)
-	router.HandleFunc("/sync", handler.SyncHandle{db}.SyncHandler)
-	router.HandleFunc("/subscribe", handler.SubHandle{db}.SubscribeHandler)
-	router.HandleFunc("/unsubscribe", handler.SubHandle{db}.UnSubscribeHandler)
+	router.HandleFunc("/sync", handler.SyncHandle{db,}.SyncHandler)
+	router.HandleFunc("/subscribe", handler.SubHandle{db,fcm,env}.SubscribeHandler)
+	router.HandleFunc("/unsubscribe", handler.SubHandle{db,fcm,env}.UnSubscribeHandler)
 	router.HandleFunc("/message", handler.MessageHandle{db}.ViewMessageHandler)
 	router.HandleFunc("/notify", handler.NotifyHandle{statusTmpl, db, fcm,env}.NotifyHandler)
 
@@ -76,7 +77,7 @@ func initConfig() {
 
 }
 
-func initFcm() *messaging.Client {
+func initFcm() *client.FCMClient {
 	creds := viper.GetString("GOOGLE_CREDS")
 	opt := option.WithCredentialsJSON([]byte(creds))
 	config := &firebase.Config{ProjectID: "tn-covid-bed-alert"}
@@ -84,11 +85,13 @@ func initFcm() *messaging.Client {
 	if err != nil {
 		log.Fatalf("error initializing app: %v\n", err)
 	}
-	client, err := app.Messaging(context.Background())
+	c, err := app.Messaging(context.Background())
 	if err != nil {
 		log.Fatalf("unable to intialise fcm %v", err)
 	}
-	return client
+	return &client.FCMClient{
+		c,
+	}
 }
 
 func initDatabase() *sqlx.DB {

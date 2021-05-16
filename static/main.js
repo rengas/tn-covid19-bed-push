@@ -1,4 +1,3 @@
-
 $(document).ready(function(){
     // Initialize the default app
     // Your web app's Firebase configuration
@@ -22,16 +21,24 @@ $(document).ready(function(){
         });
 
     messaging.onMessage(function(payload) {
-        console.log('[firebase-messaging-sw.js] Received background message ', payload);
-        // Customize notification here
-       /* const notificationTitle = 'Background Message Title';
+        console.log('[main-sw.js] Received forground message ', payload);
+        const notificationTitle = payload.notification.title;
         const notificationOptions = {
-            body: 'Background Message body.',
-            icon: '/firebase-logo.png'
+            body: payload.notification.body,
+            icon: payload.notification.icon,
         };
 
-        self.registration.showNotification(notificationTitle,
-            notificationOptions);*/
+        if (!("Notification" in window)) {
+            console.log("This browser does not support system notifications.");
+        } else if (Notification.permission === "granted") {
+            // If it's okay let's create a notification
+            var notification = new Notification(notificationTitle,notificationOptions);
+            notification.onclick = function(event) {
+                event.preventDefault();
+                window.open(payload.notification.click_action , '_blank');
+                notification.close();
+            }
+        }
     });
 
     $("#myButton").click(function() {
