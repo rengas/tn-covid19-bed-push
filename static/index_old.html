@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tamil Nadu BedsPush Notification</title>
+    <style>
+        div {
+            color: #fff;
+            font-family: Tahoma, Verdana, Segoe, sans-serif;
+            padding: 10px;
+        }
+        .container {
+            background-color: #f59b5b;
+            display:flex;
+        }
+    </style>
+</head>
+<body>
+<h1> Receive push notification for updates on VACANT hospital beds in Tamil Nadu.</h1>
+<h2> The information in this website is updated from official
+    <a href=" https://stopcorona.tn.gov.in/beds.php">https://stopcorona.tn.gov.in/beds.php</a>
+    every 15 minutes
+</h2>
+<h3>You will receive push every 20 minutes</h3>
+<div class="container">
+    <div style="display: inline-block">
+        <h2> <p>Create or update subscription for push Notification</p> </h2>
+        <h2> Please use a valid Email</h2>
+        <form id="submitForm">
+            <input type="text" name="email" value="">
+
+            <select id="district" name="district">
+                {{range $index, $element := .}}
+                    <option value={{$index}}>{{$index}}</option>
+                {{end}}
+            </select>
+            {{range $index, $element := .}}
+                <div id={{$index}} class="group">
+                    {{range $index, $val := $element}}
+                        <input type="checkbox" id={{$val.Id}} name={{$val.District}} value={{$val.Id}}>
+                        <label for={{$val.Id}}> {{$val.Institution}}</label><br>
+                    {{end}}
+                </div>
+            {{end}}
+            <input type="button" value="Submit" id="myButton" />
+        </form>
+    </div>
+    <div style="display: inline-block">
+        <h2> Remove my Subscription</h2>
+        <h2> You will be not receive notification in all devices</h2>
+        <form action="/unsubscribe" method="post">
+            Email:<input type="text" name="email">
+            <input type="submit" value="Unsubscribe">
+        </form>
+    </div>
+</div>
+<p><b>Raise your issues,bugs and concerns <a href="https://github.com/rengas/tn-covid19-bed-push/issues">
+            https://github.com/rengas/tn-covid19-bed-push/issues</a></b></p>
+<p><b>If you want to help me with this project
+        Add me on Linkedin <a href="https://www.linkedin.com/in/rengaswamy-marimuthu-6a292992/">
+            https://www.linkedin.com/in/rengaswamy-marimuthu-6a292992/</a></b> </p>
+</body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous">
+</script>
+<script src="https://www.gstatic.com/firebasejs/8.6.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.6.0/firebase-messaging.js"></script>
+<script src="/static/main.js"></script>
+
+</html>

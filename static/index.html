@@ -1,69 +1,105 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Tamil Nadu BedsPush Notification</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Hugo 0.83.1">
+    <title>TN hospital bed status</title>
+
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/jumbotron/">
+    <!-- Bootstrap core CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+
+    <!-- Favicons -->
+    <meta name="theme-color" content="#7952b3">
     <style>
-        div {
-            color: #fff;
-            font-family: Tahoma, Verdana, Segoe, sans-serif;
-            padding: 10px;
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
         }
-        .container {
-            background-color: #f59b5b;
-            display:flex;
+
+        @media (min-width: 768px) {
+            .bd-placeholder-img-lg {
+                font-size: 3.5rem;
+            }
         }
     </style>
+
 </head>
 <body>
-<h1> Receive push notification for updates on VACANT hospital beds in Tamil Nadu.</h1>
-<h2> The information in this website is updated from official
-    <a href=" https://stopcorona.tn.gov.in/beds.php">https://stopcorona.tn.gov.in/beds.php</a>
-    every 15 minutes
-</h2>
-<h3>You will receive push every 20 minutes</h3>
-<div class="container">
-    <div style="display: inline-block">
-        <h1> <p>Create or update subscription for push Notification</p> </h1>
-        <h2> Please use a valid Email</h2>
-        <form id="submitForm">
-            <input type="text" name="email" value="">
 
-            <select id="district" name="district">
-                {{range $index, $element := .}}
-                    <option value={{$index}}>{{$index}}</option>
-                {{end}}
-            </select>
-            {{range $index, $element := .}}
-                <div id={{$index}} class="group">
-                    {{range $index, $val := $element}}
-                        <input type="checkbox" id={{$val.Id}} name={{$val.District}} value={{$val.Id}}>
-                        <label for={{$val.Id}}> {{$val.Institution}}</label><br>
-                    {{end}}
+<main>
+    <div class="container py-4">
+        <header class="pb-3 mb-4 border-bottom">
+            <a href="/" class="d-flex align-items-center text-dark text-decoration-none">
+                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="32" class="me-2" viewBox="0 0 118 94" role="img"><title>Bootstrap</title><path fill-rule="evenodd" clip-rule="evenodd" d="M24.509 0c-6.733 0-11.715 5.893-11.492 12.284.214 6.14-.064 14.092-2.066 20.577C8.943 39.365 5.547 43.485 0 44.014v5.972c5.547.529 8.943 4.649 10.951 11.153 2.002 6.485 2.28 14.437 2.066 20.577C12.794 88.106 17.776 94 24.51 94H93.5c6.733 0 11.714-5.893 11.491-12.284-.214-6.14.064-14.092 2.066-20.577 2.009-6.504 5.396-10.624 10.943-11.153v-5.972c-5.547-.529-8.934-4.649-10.943-11.153-2.002-6.484-2.28-14.437-2.066-20.577C105.214 5.894 100.233 0 93.5 0H24.508zM80 57.863C80 66.663 73.436 72 62.543 72H44a2 2 0 01-2-2V24a2 2 0 012-2h18.437c9.083 0 15.044 4.92 15.044 12.474 0 5.302-4.01 10.049-9.119 10.88v.277C75.317 46.394 80 51.21 80 57.863zM60.521 28.34H49.948v14.934h8.905c6.884 0 10.68-2.772 10.68-7.727 0-4.643-3.264-7.207-9.012-7.207zM49.948 49.2v16.458H60.91c7.167 0 10.964-2.876 10.964-8.281 0-5.406-3.903-8.178-11.425-8.178H49.948z" fill="currentColor"></path></svg>
+                <span class="fs-4">Tamil Nadu Hospital beds status push notification</span>
+            </a>
+        </header>
+
+        <div class="row align-items-md-stretch">
+            <div class="col-md-6">
+                <div class="h-100 p-5 text-light bg-dark rounded-3">
+                    <h1> <p>Create or update subscription for push Notification</p> </h1>
+                    <h2> Please use a valid Email</h2>
+                    <form id="submitForm">
+                        <input type="text" name="email" value="">
+
+                        <select id="district" name="district">
+                            {{range $index, $element := .}}
+                                <option value={{$index}}>{{$index}}</option>
+                            {{end}}
+                        </select>
+                        {{range $index, $element := .}}
+                            <div id={{$index}} class="group">
+                                {{range $index, $val := $element}}
+                                    <input type="checkbox" id={{$val.Id}} name={{$val.District}} value={{$val.Id}}>
+                                    <label for={{$val.Id}}> {{$val.Institution}}</label><br>
+                                {{end}}
+                            </div>
+                        {{end}}
+                        <input type="button" value="Submit" id="myButton" />
+                    </form>
                 </div>
-            {{end}}
-            <input type="button" value="Submit" id="myButton" />
-        </form>
+            </div>
+            <div class="col-md-6">
+                <div class="h-100 p-5 bg-drk rounded-3">
+                    <h1> Remove my Subscription</h1>
+                    <h2> You will be not receive notification in all devices</h2>
+                    <form action="/unsubscribe" method="post">
+                        Email:<input type="text" name="email">
+                        <input type="submit" value="Unsubscribe">
+                    </form>
+                </div>
+            </div>
+
+        </div>
+        <div class="p-5 mb-4 bg-light rounded-3">
+            <div class="container-fluid py-5">
+                <p>Receive push notification for updates on VACANT hospital beds in Tamil Nadu.</p>
+                <p> The information in this website is updated from official
+                    <a href=" https://stopcorona.tn.gov.in/beds.php">https://stopcorona.tn.gov.in/beds.php</a>
+                    every 15 minutes
+                </p>
+                <p><b>Raise your issues,bugs and concerns <a href="https://github.com/rengas/tn-covid19-bed-push/issues">
+                            https://github.com/rengas/tn-covid19-bed-push/issues</a></b></p>
+                <p><b>If you want to help me with this project
+                        Add me on Linkedin <a href="https://www.linkedin.com/in/rengaswamy-marimuthu-6a292992/">
+                            https://www.linkedin.com/in/rengaswamy-marimuthu-6a292992/</a></b> </p>
+            </div>
+        </div>
     </div>
-    <div style="display: inline-block">
-        <h1> Remove my Subscription</h1>
-        <h2> You will be not receive notification in all devices</h2>
-        <form action="/unsubscribe" method="post">
-            Email:<input type="text" name="email">
-            <input type="submit" value="Unsubscribe">
-        </form>
-    </div>
-</div>
-<p><b>Raise your issues,bugs and concerns <a href="https://github.com/rengas/tn-covid19-bed-push/issues">
-            https://github.com/rengas/tn-covid19-bed-push/issues</a></b></p>
-<p><b>If you want to help me with this project
-        Add me on Linkedin <a href="https://www.linkedin.com/in/rengaswamy-marimuthu-6a292992/">
-            https://www.linkedin.com/in/rengaswamy-marimuthu-6a292992/</a></b> </p>
+</main>
+
 </body>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous">
 </script>
 <script src="https://www.gstatic.com/firebasejs/8.6.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.6.0/firebase-messaging.js"></script>
 <script src="/static/main.js"></script>
-
 </html>
